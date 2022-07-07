@@ -9,10 +9,6 @@ required_version = ">= 0.14.0"
       source  = "selectel/selectel"
       version = "~> 3.6.2"
     }
-     ansible = {
-      source = "habakke/ansible"
-      version = "~> 1.0"
-    }
   }
 }
 
@@ -65,7 +61,17 @@ resource "openstack_networking_router_interface_v2" "router_interface_rabbitmq" 
 }
 
 # Floating address creation
-resource "openstack_networking_floatingip_v2" "fip_rabbitmq" {
+resource "openstack_networking_floatingip_v2" "fip_rabbitmq_0" {
+  pool = "external-network"
+}
+
+# Floating address creation
+resource "openstack_networking_floatingip_v2" "fip_rabbitmq_1" {
+  pool = "external-network"
+}
+
+# Floating address creation
+resource "openstack_networking_floatingip_v2" "fip_rabbitmq_2" {
   pool = "external-network"
 }
 
@@ -132,12 +138,6 @@ resource "openstack_compute_instance_v2" "server_rabbitmq_0" {
   }
 }
 
-# Attach floating IP to first stack
-resource "openstack_compute_floatingip_associate_v2" "fip_rabbitmq-0" {
-  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq.address
-  instance_id = openstack_compute_instance_v2.server_rabbitmq_0.id
-}
-
 # Deploying second stack
 resource "openstack_compute_instance_v2" "server_rabbitmq_1" {
   name              = "server_rabbitmq_1"
@@ -185,3 +185,33 @@ resource "openstack_compute_instance_v2" "server_rabbitmq_2" {
 }
 
 
+################ Floating IP attaching ####################
+
+resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_0" {
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_0.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_0.id
+}
+
+resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_1" {
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_1.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_1.id
+}
+
+resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_2" {
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_2.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_2.id
+}
+
+################ Ansible section ####################
+
+# Rendering inventory	
+resource "local_file" "inventory" {
+  content = templatefile("./templates/inventory.tmpl",
+    {
+      ip0 = openstack_networking_floatingip_v2.fip_rabbitmq_0.address
+      ip1 = openstack_networking_floatingip_v2.fip_rabbitmq_1.address
+      ip2 = openstack_networking_floatingip_v2.fip_rabbitmq_2.address
+    }
+  )
+  filename = "./inventory/hosts"
+}
