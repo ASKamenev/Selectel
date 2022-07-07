@@ -1,0 +1,21 @@
+---
+- name: Install Haproxy load balancer
+  hosts: all
+  become yes
+  tasks:
+    - name: Install haproxy for the first server
+      package:
+        name: haproxy
+        state: latest
+    - name: Copy jinja config template
+      template:
+        src:  haproxy_config.j2
+        dest: /etc/haproxy/haproxy.cfg
+    - name: Reload haproxy service
+      service:
+        name: haproxy
+        state: restarted
+        enabled: yes
+      
+
+

@@ -1,0 +1,20 @@
+---
+
+- name: Deploying a rabbimq server
+  hosts: localhost
+  become: yes
+  tasks:
+    # Update all packages
+    - name: Upgrade all packages
+      ansible.builtin.package:
+        name: '*'
+        state: latest
+
+    - name: Install rabbitmq
+      ansible.builtin.package:
+        name: rabbitmq-server
+        state: latest
+
+    - include_role:
+        name: haproxy  
+      when: "'rabbitmq-0' in inventory_hostname" 
