@@ -49,6 +49,7 @@ resource "openstack_networking_router_v2" "router_rabbitmq" {
 # Creating a network
 resource "openstack_networking_network_v2" "network_rabbitmq" {
   name = "network_rabbitmq"
+}
 
 # Creating a subnet
 resource "openstack_networking_subnet_v2" "subnet_rabbitmq" {
@@ -74,8 +75,8 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-0" {
   name                 = "volume_rabbitmq-0"
   size                 = "20"
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557" 
-  volume_type          = var.volume_type  <--- need to check what is this? 
-  availability_zone    = var.az_zone      <--- need to check what is this?
+  volume_type          = var.volume_type 
+  availability_zone    = var.az_zone
   enable_online_resize = true
   lifecycle {
     ignore_changes = [image_id]
@@ -86,8 +87,8 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-1" {
   name                 = "volume_rabbitmq-1"
   size                 = "20"
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
-  volume_type          = var.volume_type  <--- need to check what is this?
-  availability_zone    = var.az_zone      <--- need to check what is this?
+  volume_type          = var.volume_type
+  availability_zone    = var.az_zone
   enable_online_resize = true
   lifecycle {
     ignore_changes = [image_id]
@@ -98,8 +99,8 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-2" {
   name                 = "volume_rabbitmq-2"
   size                 = "20"
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
-  volume_type          = var.volume_type  <--- need to check what is this?
-  availability_zone    = var.az_zone      <--- need to check what is this?
+  volume_type          = var.volume_type
+  availability_zone    = var.az_zone 
   enable_online_resize = true
   lifecycle {
     ignore_changes = [image_id]
