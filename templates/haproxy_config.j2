@@ -72,6 +72,6 @@ frontend main
 #---------------------------------------------------------------------
 backend app
     balance     roundrobin
-    server  rabbitmq-0 {{ ip_from_vars }}:5672 check   <--- TO DO
-    server  rabbitmq-1 {{ ip_from_vars }}:5672 check   <--- TO DO
-    server  rabbitmq-2 {{ ip_from_vars }}:5672 check   <--- TO DO
+    server  rabbitmq-0 {{ server_rabbitmq_0 }}:5672 check
+    server  rabbitmq-1 {{ server_rabbitmq_1 }}:5672 check
+    server  rabbitmq-2 {{ server_rabbitmq_2 }}:5672 check

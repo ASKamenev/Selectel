@@ -113,7 +113,7 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_2" {
   }
 }
 
-################ Stack Creation ####################
+################ Instance Creation ####################
 
 # Deploying first stack
 resource "openstack_compute_instance_v2" "server_rabbitmq_0" {
@@ -215,3 +215,21 @@ resource "local_file" "inventory" {
   )
   filename = "./inventory/hosts"
 }
+
+resource "local_file" "haproxy_vars" {
+  content = <<-DOC
+    ---
+    server_rabbitmq_0: ${openstack_networking_floatingip_v2.fip_rabbitmq_0.address}
+    server_rabbitmq_1: ${openstack_networking_floatingip_v2.fip_rabbitmq_1.address}
+    server_rabbitmq_2: ${openstack_networking_floatingip_v2.fip_rabbitmq_2.address}
+    DOC
+  filename = "./roles/haproxy/vars/main.yml"
+}
+
+
+#####This role is starting to run before any vms is created, IDK why####
+#resource "null_resource" "ansible-play" {
+#  provisioner "local-exec" {
+#    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i ./inventory --private-key ~/.ssh/selectel deploy_servers.yml"
+#  }
+#}

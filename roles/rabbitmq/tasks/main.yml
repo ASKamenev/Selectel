@@ -1,0 +1,8 @@
+---
+- name: Add repo to repolist
+  shell: "curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | bash"
+ 
+- name: Install rabbitmq-server
+  package:
+    name: rabbitmq-server
+    state: latest
