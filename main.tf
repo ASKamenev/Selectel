@@ -71,8 +71,8 @@ resource "openstack_networking_floatingip_v2" "fip_rabbitmq" {
 
 ################ Volume Creation ####################
 
-resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-0" {
-  name                 = "volume_rabbitmq-0"
+resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_0" {
+  name                 = "volume_rabbitmq_0"
   size                 = "20"
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557" 
   volume_type          = var.volume_type 
@@ -83,8 +83,8 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-0" {
   }
 }
 
-resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-1" {
-  name                 = "volume_rabbitmq-1"
+resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_1" {
+  name                 = "volume_rabbitmq_1"
   size                 = "20"
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
   volume_type          = var.volume_type
@@ -95,8 +95,8 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-1" {
   }
 }
 
-resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-2" {
-  name                 = "volume_rabbitmq-2"
+resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_2" {
+  name                 = "volume_rabbitmq_2"
   size                 = "20"
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
   volume_type          = var.volume_type
@@ -110,13 +110,78 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq-2" {
 ################ Stack Creation ####################
 
 # Deploying first stack
-resource "openstack_compute_instance_v2" "rabbitmq-0" {
-  name            = "rabbitmq-0"
-  flavor_id       = "1011"
-  key_pair        = "key_rabbitmq"
-  security_groups = ["default"]
-
+resource "openstack_compute_instance_v2" "server_rabbitmq_0" {
+  name              = "server_rabbitmq_0"
+  flavor_id         = var.flavor
+  key_pair          = openstack_compute_keypair_v2.key_rabbitmq.id
+  availability_zone = var.az_zone
   network {
-    name = "my_network"
+    uuid = openstack_networking_network_v2.network_rabbitmq.id
+  }
+  block_device {
+    uuid             = openstack_blockstorage_volume_v3.volume_rabbitmq_0.id
+    source_type      = "volume"
+    destination_type = "volume"
+    boot_index       = 0
+  }
+  vendor_options {
+    ignore_resize_confirmation = true
+  }
+  lifecycle {
+    ignore_changes = [image_id]
   }
 }
+
+# Attach floating IP to first stack
+resource "openstack_compute_floatingip_associate_v2" "fip_rabbitmq-0" {
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_0.id
+}
+
+# Deploying second stack
+resource "openstack_compute_instance_v2" "server_rabbitmq_1" {
+  name              = "server_rabbitmq_1"
+  flavor_id         = var.flavor
+  key_pair          = openstack_compute_keypair_v2.key_rabbitmq.id
+  availability_zone = var.az_zone
+  network {
+    uuid = openstack_networking_network_v2.network_rabbitmq.id
+  }
+  block_device {
+    uuid             = openstack_blockstorage_volume_v3.volume_rabbitmq_1.id
+    source_type      = "volume"
+    destination_type = "volume"
+    boot_index       = 0
+  }
+  vendor_options {
+    ignore_resize_confirmation = true
+  }
+  lifecycle {
+    ignore_changes = [image_id]
+  }
+}
+
+# Deploying third stack
+resource "openstack_compute_instance_v2" "server_rabbitmq_2" {
+  name              = "server_rabbitmq_2"
+  flavor_id         = var.flavor
+  key_pair          = openstack_compute_keypair_v2.key_rabbitmq.id
+  availability_zone = var.az_zone
+  network {
+    uuid = openstack_networking_network_v2.network_rabbitmq.id
+  }
+  block_device {
+    uuid             = openstack_blockstorage_volume_v3.volume_rabbitmq_2.id
+    source_type      = "volume"
+    destination_type = "volume"
+    boot_index       = 0
+  }
+  vendor_options {
+    ignore_resize_confirmation = true
+  }
+  lifecycle {
+    ignore_changes = [image_id]
+  }
+}
+
+
