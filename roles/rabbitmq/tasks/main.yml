@@ -28,6 +28,11 @@
     name: rabbitmq-server
     state: latest
 
+- name: Copy Rabitmq conf file
+  copy:
+    src: rabbitmq.conf
+    dest: /etc/rabbitmq/rabbitmq.conf
+
 - name: Enabling rabbitmq service
   shell: "chkconfig rabbitmq-server on"
 
