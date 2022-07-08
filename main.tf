@@ -79,7 +79,7 @@ resource "openstack_networking_floatingip_v2" "fip_rabbitmq_2" {
 
 resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_0" {
   name                 = "volume_rabbitmq_0"
-  size                 = "20"
+  size                 = var.volume_size
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557" 
   volume_type          = var.volume_type 
   availability_zone    = var.az_zone
@@ -91,7 +91,7 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_0" {
 
 resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_1" {
   name                 = "volume_rabbitmq_1"
-  size                 = "20"
+  size                 = var.volume_size
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
   volume_type          = var.volume_type
   availability_zone    = var.az_zone
@@ -103,7 +103,7 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_1" {
 
 resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_2" {
   name                 = "volume_rabbitmq_2"
-  size                 = "20"
+  size                 = var.volume_size
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
   volume_type          = var.volume_type
   availability_zone    = var.az_zone 

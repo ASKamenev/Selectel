@@ -13,6 +13,11 @@ variable "vms_count" {
   default = "3"
 }
 
+# Volume size
+variable "volume_size"
+  default = "20"
+}
+
 # Region name
 variable "region" {
   default = "ru-1"
