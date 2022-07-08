@@ -8,6 +8,11 @@ variable "password" {
   type        = string
 }
 
+# Instances count
+variable "vms_count" {
+  default = "3"
+}
+
 # Region name
 variable "region" {
   default = "ru-1"
