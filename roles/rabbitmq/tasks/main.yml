@@ -15,11 +15,23 @@
     src: erlang-latest.repo
     dest: /etc/yum.repos.d/ 
 
-- name: install dependencies
+- name: Install dependencies
   package: 
-    name: erlang
+    name: "{{ item }}"
+  loop:
+    - erlang
+    - socat
+    - logrotate
  
 - name: Install rabbitmq-server
   package:
     name: rabbitmq-server
     state: latest
+
+- name: Enabling rabbitmq service
+  shell: "chkconfig rabbitmq-server on"
+
+- name: Start rabbitmq server
+  service:
+    name: rabbitmq-server
+    state: started

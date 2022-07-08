@@ -4,7 +4,10 @@
   hosts: rabbitmq
   become: yes
   tasks:
-    # Update all packages
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+
     - name: Upgrade all packages
       ansible.builtin.package:
         name: '*'

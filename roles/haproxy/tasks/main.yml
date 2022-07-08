@@ -3,12 +3,16 @@
   package:
     name: haproxy
     state: latest
+
 - name: Copy jinja config template
   template:
     src:  haproxy_config.j2
     dest: /etc/haproxy/haproxy.cfg
+  register: conf_copy
+
 - name: Reload haproxy service
   service:
     name: haproxy
     state: restarted
     enabled: yes
+  when: conf_copy.changed 
