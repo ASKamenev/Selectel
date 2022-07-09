@@ -14,7 +14,7 @@ variable "vms_count" {
 }
 
 # Volume size
-variable "volume_size"
+variable "volume_size" {
   default = "20"
 }
 

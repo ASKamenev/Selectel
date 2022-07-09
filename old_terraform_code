@@ -61,30 +61,37 @@ resource "openstack_networking_router_interface_v2" "router_interface_rabbitmq" 
 }
 
 # Floating address creation
-resource "openstack_networking_floatingip_v2" "fip_rabbitmq" {
-  count = var.vms_count
-  pool  = "external-network"
-  tags = {
-    Name = "fip_rabbitmq_${count.index}"
-  }
+resource "openstack_networking_floatingip_v2" "fip_rabbitmq_0" {
+  pool = "external-network"
 }
 
 # Floating address creation
-#resource "openstack_networking_floatingip_v2" "fip_rabbitmq_1" {
-#  pool = "external-network"
-#}
+resource "openstack_networking_floatingip_v2" "fip_rabbitmq_1" {
+  pool = "external-network"
+}
 
 # Floating address creation
-#resource "openstack_networking_floatingip_v2" "fip_rabbitmq_2" {
-#  pool = "external-network"
-#}
+resource "openstack_networking_floatingip_v2" "fip_rabbitmq_2" {
+  pool = "external-network"
+}
 
 ################ Volume Creation ####################
 
-resource "openstack_blockstorage_volume_v3" "volume_rabbitmq" {
-  name                 = "volume_rabbitmq_${count.index}"
-  count                = var.vms_count
-  size                 = "20"
+resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_0" {
+  name                 = "volume_rabbitmq_0"
+  size                 = var.volume_size
+  image_id             = "8f3c4108-de09-4333-87ab-c53523d93557" 
+  volume_type          = var.volume_type 
+  availability_zone    = var.az_zone
+  enable_online_resize = true
+  lifecycle {
+    ignore_changes = [image_id]
+  }
+}
+
+resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_1" {
+  name                 = "volume_rabbitmq_1"
+  size                 = var.volume_size
   image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
   volume_type          = var.volume_type
   availability_zone    = var.az_zone
@@ -94,13 +101,23 @@ resource "openstack_blockstorage_volume_v3" "volume_rabbitmq" {
   }
 }
 
+resource "openstack_blockstorage_volume_v3" "volume_rabbitmq_2" {
+  name                 = "volume_rabbitmq_2"
+  size                 = var.volume_size
+  image_id             = "8f3c4108-de09-4333-87ab-c53523d93557"
+  volume_type          = var.volume_type
+  availability_zone    = var.az_zone 
+  enable_online_resize = true
+  lifecycle {
+    ignore_changes = [image_id]
+  }
+}
 
 ################ Instance Creation ####################
 
-
-resource "openstack_compute_instance_v2" "server_rabbitmq" {
-  name              = "server_rabbitmq_${count.index}"
-  count             = var.vms_count
+# Deploying first stack
+resource "openstack_compute_instance_v2" "server_rabbitmq_0" {
+  name              = "server_rabbitmq_0"
   flavor_id         = var.flavor
   key_pair          = openstack_compute_keypair_v2.key_rabbitmq.id
   availability_zone = var.az_zone
@@ -108,7 +125,7 @@ resource "openstack_compute_instance_v2" "server_rabbitmq" {
     uuid = openstack_networking_network_v2.network_rabbitmq.id
   }
   block_device {
-    uuid             = "${element(openstack_blockstorage_volume_v3.volume_rabbitmq[*].id, count.index)}"
+    uuid             = openstack_blockstorage_volume_v3.volume_rabbitmq_0.id
     source_type      = "volume"
     destination_type = "volume"
     boot_index       = 0
@@ -121,22 +138,69 @@ resource "openstack_compute_instance_v2" "server_rabbitmq" {
   }
 }
 
+# Deploying second stack
+resource "openstack_compute_instance_v2" "server_rabbitmq_1" {
+  name              = "server_rabbitmq_1"
+  flavor_id         = var.flavor
+  key_pair          = openstack_compute_keypair_v2.key_rabbitmq.id
+  availability_zone = var.az_zone
+  network {
+    uuid = openstack_networking_network_v2.network_rabbitmq.id
+  }
+  block_device {
+    uuid             = openstack_blockstorage_volume_v3.volume_rabbitmq_1.id
+    source_type      = "volume"
+    destination_type = "volume"
+    boot_index       = 0
+  }
+  vendor_options {
+    ignore_resize_confirmation = true
+  }
+  lifecycle {
+    ignore_changes = [image_id]
+  }
+}
+
+# Deploying third stack
+resource "openstack_compute_instance_v2" "server_rabbitmq_2" {
+  name              = "server_rabbitmq_2"
+  flavor_id         = var.flavor
+  key_pair          = openstack_compute_keypair_v2.key_rabbitmq.id
+  availability_zone = var.az_zone
+  network {
+    uuid = openstack_networking_network_v2.network_rabbitmq.id
+  }
+  block_device {
+    uuid             = openstack_blockstorage_volume_v3.volume_rabbitmq_2.id
+    source_type      = "volume"
+    destination_type = "volume"
+    boot_index       = 0
+  }
+  vendor_options {
+    ignore_resize_confirmation = true
+  }
+  lifecycle {
+    ignore_changes = [image_id]
+  }
+}
+
+
 ################ Floating IP attaching ####################
 
 resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_0" {
-  floating_ip = "${element(openstack_networking_floatingip_v2.fip_rabbitmq[*].address, count.index)}"
-  instance_id = "${element(openstack_compute_instance_v2.server_rabbitmq[*].id, count.index)}"
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_0.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_0.id
 }
 
-#resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_1" {
-#  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_1.address
-#  instance_id = openstack_compute_instance_v2.server_rabbitmq_1.id
-#}
+resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_1" {
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_1.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_1.id
+}
 
-#resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_2" {
-#  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_2.address
-#  instance_id = openstack_compute_instance_v2.server_rabbitmq_2.id
-#}
+resource "openstack_compute_floatingip_associate_v2" "afip_rabbitmq_2" {
+  floating_ip = openstack_networking_floatingip_v2.fip_rabbitmq_2.address
+  instance_id = openstack_compute_instance_v2.server_rabbitmq_2.id
+}
 
 ################ Ansible section ####################
 
