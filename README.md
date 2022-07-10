@@ -26,8 +26,9 @@ Here is a file tree:
 └── vars.tf
 
 To deploy the rabbitmq servers, you need to run terrafor code firstly:
+```Bash
 [user@host ~]$ terraform apply
-
+```
 It will create all necessry resources in Openstack such as: network, subnet, fip, volumes, instances, etc and also generated inventpry and some var file for ansible.
 After all deployment wil done, please wait until all three nodes will become available and run ansible code:
 [user@host ~]$ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i ./inventory --private-key $(PATH_TO_KEY) deploy_servers.yml
