@@ -3,7 +3,6 @@ This code was designed to implement several rabbitmq servers with haproxy as the
 All code was prepaired to work with Openstack provider.
 
 Here is a file tree:
------------------------------------------------------------------------------------------------
 .
 ├── roles
 │   ├── haproxy
@@ -25,7 +24,6 @@ Here is a file tree:
 ├── receive.py
 ├── send.py
 └── vars.tf
------------------------------------------------------------------------------------------------
 
 To deploy the rabbitmq servers, you need to run terrafor code firstly:
 [user@host ~]$ terraform apply
@@ -59,4 +57,3 @@ name	messages
 hello	26
 
 Now, let's try to recieve all messeges from one of the servers. just run recieve.py with appropriate IP and voila! Here is your's messeges. 
-
